@@ -140,8 +140,14 @@ green-linter . --country PER --json | jq '.summary'
 ```json
 {
   "total_findings": 18,
-  "total_wasted_bytes": 551704957,
-  "total_co2_grams": 8.995,
+  "total_wasted_bytes": 701753344,
+  "total_co2_grams": 11.441,
+  "lightbulb_hours": 4.357,
+  "waste_profile": {
+    "emoji": "💀",
+    "label": "RAGEST",
+    "message": "Your project weighs more than my first laptop."
+  },
   "by_category": {
     "Phantom Dependency": 14,
     "Build Artifact": 2,
@@ -153,16 +159,20 @@ green-linter . --country PER --json | jq '.summary'
 
 ## CO2 Estimation
 
-Every finding with measurable bytes gets a CO2 estimate:
+Every finding with measurable bytes gets a CO2 estimate using peer-reviewed methodology:
 
 ```
-605.96 MB x 0.06 kWh/GB x 291.77 gCO2/kWh (PER) = 10.3595 gCO2
+📐 Method: 0.06 kWh/GB (Aslan 2018) × grid intensity (Ember 2023)
+💡 Like keeping a 9W LED on for ~4.4 hours
+📊 💀 RAGEST (669.2 MB) — Your project weighs more than my first laptop.
 ```
 
-- **Bytes wasted**: measured from real package sizes and image deltas
 - **Energy per byte**: 0.06 kWh/GB ([Aslan et al. 2018](https://doi.org/10.1111/jiec.12630))
 - **Carbon intensity**: per-country from [Ember Climate 2023](https://ember-climate.org/data/data-tools/data-explorer/) (209 countries, CC-BY-4.0)
+- **LED bulb equivalent**: country-independent metric (grid intensity cancels out) -- compares waste energy to a standard 9W LED bulb
+- **Waste profile**: 3-tier RAGE scale (CHILL / ANGRY / RAGEST) with sarcastic feedback, inspired by [SWD Digital Carbon Ratings](https://sustainablewebdesign.org/digital-carbon-ratings/) and [Green Software Foundation](https://greensoftware.foundation/)
 - **Default**: World average (483.18 gCO2/kWh)
+- **Disk size**: measures actual disk allocation (not apparent file size) for 99%+ accuracy
 
 ## Principles
 

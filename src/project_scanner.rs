@@ -2,6 +2,9 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+#[cfg(unix)]
+use std::os::unix::fs::MetadataExt;
+
 pub struct ArtifactDir {
     pub name: String,
     pub size: u64,
@@ -189,7 +192,14 @@ fn dir_size_recursive(path: &Path) -> u64 {
                 Err(_) => continue,
             };
             if meta.is_file() {
-                total += meta.len();
+                #[cfg(unix)]
+                {
+                    total += meta.blocks() * 512;
+                }
+                #[cfg(not(unix))]
+                {
+                    total += meta.len();
+                }
             } else if meta.is_dir() {
                 total += dir_size_recursive(&entry.path());
             }

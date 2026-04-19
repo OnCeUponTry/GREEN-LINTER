@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use colored::Colorize;
 use serde::Serialize;
 
-use crate::co2_estimator::Co2Estimator;
+use crate::co2_estimator::{Co2Estimator, WasteProfile};
 use crate::eco_checks::{Finding, FindingCategory};
 use crate::project_scanner::ProjectInfo;
 
@@ -33,6 +33,8 @@ struct JsonSummary {
     total_findings: usize,
     total_wasted_bytes: u64,
     total_co2_grams: f64,
+    lightbulb_hours: f64,
+    waste_profile: WasteProfile,
     by_category: HashMap<String, usize>,
 }
 
@@ -79,6 +81,8 @@ pub fn print_json(project: &ProjectInfo, findings: &[Finding], estimator: &Co2Es
             total_findings: findings.len(),
             total_wasted_bytes: total_wasted,
             total_co2_grams: estimator.bytes_to_gco2(total_wasted),
+            lightbulb_hours: Co2Estimator::lightbulb_hours(total_wasted),
+            waste_profile: Co2Estimator::waste_profile(total_wasted),
             by_category,
         },
         findings: json_findings,
@@ -218,6 +222,8 @@ pub fn print_report(project: &ProjectInfo, findings: &[Finding], estimator: &Co2
     // Total CO2
     if total_wasted > 0 {
         let total_gco2 = estimator.bytes_to_gco2(total_wasted);
+        let bulb_hours = Co2Estimator::lightbulb_hours(total_wasted);
+        let profile = Co2Estimator::waste_profile(total_wasted);
         println!("{}", "--- CO2 Impact Summary ---".green().bold());
         println!(
             "  Total waste measured: {}",
@@ -228,11 +234,21 @@ pub fn print_report(project: &ProjectInfo, findings: &[Finding], estimator: &Co2
             total_gco2
         );
         println!(
-            "  Calculation: {}",
-            estimator.format_chain(total_wasted).dimmed()
+            "  {} {}",
+            "\u{1f4d0} Method:".white().bold(),
+            "0.06 kWh/GB (Aslan 2018) \u{00d7} grid intensity (Ember 2023)".dimmed()
         );
         println!(
-            "  Sources: Ember Climate 2023 (CC-BY), Aslan et al. 2018",
+            "  \u{1f4a1} Like keeping a 9W LED on for ~{:.1} hours",
+            bulb_hours
+        );
+        println!(
+            "  \u{1f4ca} {} {} ({}) \u{2014} {}  {}",
+            profile.emoji,
+            profile.label.yellow().bold(),
+            format_bytes(total_wasted),
+            profile.message.italic(),
+            "[SWD + GSF inspired]".dimmed()
         );
         println!();
     }
@@ -254,7 +270,7 @@ fn print_footer() {
     );
     println!(
         "  {}",
-        "green-linter v0.1.0 -- https://github.com/OnCeUponTry/green-linter"
+        "green-linter v0.2.0 -- https://github.com/OnCeUponTry/green-linter"
             .dimmed()
     );
     println!();
