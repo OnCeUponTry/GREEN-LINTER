@@ -1,0 +1,32 @@
+[package]
+name = "green-linter"
+version = "0.1.0"
+edition = "2021"
+authors = ["Carlos Enrique Castro Lazaro <the@angriestboy.com>"]
+description = "Static project structure auditor that detects computational waste and estimates CO2 impact"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/OnCeUponTry/green-linter"
+homepage = "https://github.com/OnCeUponTry/green-linter"
+readme = "README.md"
+keywords = ["sustainability", "linter", "co2", "green", "audit"]
+categories = ["command-line-utilities", "development-tools"]
+exclude = ["DEFINICION.md", "MEJORAS.md"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] } # audit: 2026-04-19
+colored = "2" # audit: 2026-04-19
+serde = { version = "1", features = ["derive"] } # audit: 2026-04-19
+serde_json = "1" # audit: 2026-04-19
+
+[profile.fast]
+inherits = "dev"
+opt-level = 2
+codegen-units = 8
+
+[profile.dist]
+inherits = "release"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

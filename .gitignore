@@ -1,0 +1,9 @@
+/target/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Internal project docs (contain local paths)
+DEFINICION.md
+MEJORAS.md
